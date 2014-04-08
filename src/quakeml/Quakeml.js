@@ -82,6 +82,9 @@ define([], function () {
 			}
 			value = value[arg];
 		}
+		if (typeof value === 'undefined') {
+			return null;
+		}
 		return value;
 	}
 
