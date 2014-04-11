@@ -15,8 +15,7 @@ require.config({
 	baseUrl: '..',
 	paths: {
 		mocha: 'mocha/mocha',
-		chai: 'chai/chai',
-		Quakeml: 'quakeml/Quakeml'
+		chai: 'chai/chai'
 	},
 	shim: {
 		mocha: {
@@ -26,13 +25,7 @@ require.config({
 			deps: ['mocha'],
 			exports: 'chai'
 		}
-	},
-	packages: [
-		{
-			name: 'quakeml',
-			main: 'Quakeml'
-		}
-	]
+	}
 });
 
 require([
@@ -45,6 +38,7 @@ require([
 
 	// Add each test class here as they are implemented
 	require([
+		'spec/XmlUtilTest',
 		'spec/QuakemlTest'
 	], function () {
 		if (window.mochaPhantomJS) {
