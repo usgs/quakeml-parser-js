@@ -50,12 +50,15 @@ require([
 	 *        an origin object as parsed by Quakeml.
 	 * @return {String} html markup.
 	 */
-	var showOrigin = function (o) {
+	var showOrigin = function (origin) {
 		var buf = [],
-		    origin = o.origin,
-		    arrivals = o.arrivals;
+		    arrivals = origin.arrivals,
+		    arrival,
+		    pick,
+		    station,
+		    a;
 		buf.push('<section class="origin">',
-				'<header><h2>', o.id, '</h2></header>');
+				'<header><h2>', origin.publicID, '</h2></header>');
 		// output origin properties
 		buf.push(showObject(origin));
 		// output origin arrivals
@@ -78,10 +81,10 @@ require([
 						'<th>Weight</th>',
 					'</tr></thead>',
 					'<tbody>');
-			arrivals.forEach(function (a) {
-				var arrival = a.arrival,
-				    pick = a.pick,
-				    station = pick.waveformID;
+			for (a = 0; a < arrivals.length; a++) {
+				arrival = arrivals[a];
+				pick = arrival.pick;
+				station = pick.waveformID;
 				buf.push(
 						'<tr>',
 							'<td>',
@@ -98,19 +101,26 @@ require([
 							'<td>', arrival.timeResidual, '</td>',
 							'<td>', arrival.timeWeight, '</td>',
 						'</tr>');
-			});
+			}
 			buf.push('</tbody></table>');
 		}
 		buf.push('</section>');
 		return buf.join('');
 	};
 
-	var showMagnitude = function (m) {
+	var showMagnitude = function (magnitude) {
 		var buf = [],
-		    magnitude = m.magnitude,
-		    contributions = m.contributions;
+		    contributions = magnitude.contributions,
+		    contribution,
+		    stationMagnitude,
+		    amplitude,
+		    station,
+		    amp,
+		    period,
+		    status,
+		    c;
 		buf.push('<section class="magnitude">',
-				'<header><h2>', m.id, '</h2></header>');
+				'<header><h2>', magnitude.publicID, '</h2></header>');
 		// output magnitude properties
 		buf.push(showObject(magnitude));
 		// output magnitude amplitudes
@@ -124,31 +134,23 @@ require([
 						'<th>',
 							'<abbr title="Network Station Channel Location">NSCL</abbr>',
 						'</th>',
-						'<th>Distance</th>',
-						'<th>Azimuth</th>',
 						'<th>Type</th>',
+						'<th>Magnitude</th>',
 						'<th>Amplitude</th>',
 						'<th>Period</th>',
 						'<th>Status</th>',
-						'<th>Magnitude</th>',
 						'<th>Weight</th>',
 					'</tr></thead>',
 					'<tbody>');
-			contributions.forEach(function (c) {
-				var contribution = c.contribution,
-				    stationMagnitude = c.stationMagnitude,
-				    amplitude = c.amplitude,
-				    arrival = c.arrival,
-				    station = stationMagnitude.waveformID || amplitude.waveformID,
-				    distance = '-',
-				    azimuth = '-',
-				    amp = '-',
-				    period = '-',
-				    status = '-';
-				if (arrival) {
-					distance = arrival.distance + '&deg;';
-					azimuth = arrival.azimuth + '&deg;';
-				}
+			for (c = 0; c < contributions.length; c++) {
+				contribution = contributions[c];
+				stationMagnitude = contribution.stationMagnitude;
+				amplitude = stationMagnitude.amplitude || {};
+				station = stationMagnitude.waveformID || amplitude.waveformID;
+
+				amp = '-';
+				period = '-';
+				status = '-';
 				if (amplitude) {
 					if (amplitude.genericAmplitude) {
 						amp = amplitude.genericAmplitude.value + amplitude.unit;
@@ -166,16 +168,14 @@ require([
 								' ', station.channelCode,
 								' ', station.locationCode,
 							'</td>',
-							'<td>', distance, '</td>',
-							'<td>', azimuth, '</td>',
 							'<td>', stationMagnitude.type, '</td>',
+							'<td>', stationMagnitude.mag.value, '</td>',
 							'<td>', amp, '</td>',
 							'<td>', period, '</td>',
 							'<td>', status, '</td>',
-							'<td>', stationMagnitude.mag.value, '</td>',
 							'<td>', contribution.weight, '</td>',
 						'</tr>');
-			});
+			}
 			buf.push('</tbody></table>');
 		}
 		buf.push('</section>');
@@ -190,22 +190,28 @@ require([
 	xhr.open('GET', url, true);
 	xhr.onload = function () {
 		var quakeml = new Quakeml({xml: xhr.responseXML}),
-		    buf = [];
+		    buf = [],
+		    origins,
+		    o,
+		    magnitudes,
+		    m;
 		// link to original message
 		buf.push('<p><a href="', url, '" target="_blank">',
 				'Original Quakeml Message',
 				'</a></p>');
 		// list origins
 		buf.push('<div class="origins">');
-		quakeml.getOrigins().forEach(function (o) {
-			buf.push(showOrigin(o));
-		});
+		origins = quakeml.getOrigins();
+		for (o = 0; o < origins.length; o++) {
+			buf.push(showOrigin(origins[o]));
+		}
 		buf.push('</div>');
 		// list magnitudes
 		buf.push('<div class="magnitudes">');
-		quakeml.getMagnitudes().forEach(function (m) {
+		magnitudes = quakeml.getMagnitudes;
+		for (m = 0; m < magnitudes.length; m++) {
 			buf.push(showMagnitude(m));
-		});
+		}
 		buf.push('</div>');
 		// insert into page
 		el.innerHTML = buf.join('');
