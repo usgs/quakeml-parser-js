@@ -1,19 +1,24 @@
 {
 	"name": "quakeml-parser-js",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"homepage": "http://earthquake.usgs.gov/",
 	"repository": {"type":"git","url":"https://github.com/usgs/quakeml-parser-js.git"},
 	"description": "Quakeml Parser for JavaScript",
 	"author": {
-		"name": "",
-		"email": ""
+		"name": "Jeremy Fee",
+		"email": "jmfee@usgs.gov"
 	},
 	"contributors": [
+		{
+			"name": "Eric Martinez",
+			"email": "emartinez@usgs.gov"
+		}
 	],
 	"keywords": [
 		"usgs",
 		"ehp",
-		"hazdev"
+		"hazdev",
+		"quakeml"
 	],
 	"scripts": {
 		"test": "grunt test"
@@ -34,6 +39,6 @@
 		"mocha": "~1.9.0"
 	},
 	"engines": {
-		"node": ">=0.8.0"
+		"node": ">=0.10.0"
 	}
 }
