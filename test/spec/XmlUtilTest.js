@@ -1,43 +1,33 @@
-/* global define, describe, it */
-define([
-	'chai',
+/* global chai, describe, it */
+'use strict';
+var XmlUtil = require('quakeml/XmlUtil'),
+    expect = chai.expect;
 
-	'quakeml/XmlUtil'
-], function (
-	chai,
+describe('XmlUtil unit tests', function () {
 
-	XmlUtil
-) {
-	'use strict';
-	var expect = chai.expect;
+  describe('xmlToJson', function () {
 
-	describe('XmlUtil unit tests', function () {
+    it('parses xml strings', function () {
+      var xmlString = '<el><child1>value1</child1></el>',
+          json = XmlUtil.xmlToJson(xmlString);
 
-		describe('xmlToJson', function () {
+      expect(json.el.child1).to.equal('value1');
+    });
 
-			it('parses xml strings', function () {
-				var xmlString = '<el><child1>value1</child1></el>',
-				    json = XmlUtil.xmlToJson(xmlString);
+    it('uses array if multiple elements have the same name', function () {
+      var xmlString,
+          json;
 
-				expect(json.el.child1).to.equal('value1');
-			});
+      xmlString = '<el>' +
+          '<child1>value1</child1>' +
+          '<child1>value2</child1>' +
+          '</el>';
+      json = XmlUtil.xmlToJson(xmlString);
+      expect(Array.isArray(json.el.child1)).to.equal(true);
+      expect(json.el.child1[0]).to.equal('value1');
+      expect(json.el.child1[1]).to.equal('value2');
+    });
 
-			it('uses array if multiple elements have the same name', function () {
-				var xmlString,
-				    json;
-
-				xmlString = '<el>' +
-						'<child1>value1</child1>' +
-						'<child1>value2</child1>' +
-						'</el>';
-				json = XmlUtil.xmlToJson(xmlString);
-				expect(Array.isArray(json.el.child1)).to.equal(true);
-				expect(json.el.child1[0]).to.equal('value1');
-				expect(json.el.child1[1]).to.equal('value2');
-			});
-
-		});
-
-	});
+  });
 
 });

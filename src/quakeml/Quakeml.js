@@ -1,85 +1,88 @@
-/* global define */
-define([
-	'./XmlUtil',
-	'./QuakemlEvent'
-], function (
-	XmlUtil,
-	QuakemlEvent
-) {
-	'use strict';
+'use strict';
+
+var XmlUtil = require('./XmlUtil'),
+    QuakemlEvent = require('./QuakemlEvent');
 
 
-	/**
-	 * Create a new Quakeml object.
-	 *
-	 * @param options {Object}
-	 * @param options.xml {String|XMLDocument}
-	 *        quakeml xml to parse.
-	 *        If a string, options.xml is parsed using DOMParser.
-	 * @param options.eventElement {String}
-	 *        Default 'event'.
-	 *        The event element inside eventParameters to find.
-	 *        The first matching element is parsed during _initialize.
-	 */
-	var Quakeml = function (options) {
-		this._options = options;
-		this._initialize();
-	};
+/**
+ * Create a new Quakeml object.
+ *
+ * @param options {Object}
+ * @param options.xml {String|XMLDocument}
+ *        quakeml xml to parse.
+ *        If a string, options.xml is parsed using DOMParser.
+ * @param options.eventElement {String}
+ *        Default 'event'.
+ *        The event element inside eventParameters to find.
+ *        The first matching element is parsed during _initialize.
+ */
+var Quakeml = function (options) {
+  var _this,
+      _initialize,
+
+      _event,
+      _updated,
+      _quakeml;
 
 
-	/**
-	 * Initialize the quakeml object.
-	 */
-	Quakeml.prototype._initialize = function () {
-		var options = this._options,
-		    eventElement = options.eventElement || 'event',
-		    json,
-		    quakeml,
-		    eventParameters,
-		    ev;
+  _this = Object.create({});
 
-		json = XmlUtil.xmlToJson(options.xml);
-		quakeml = json['q:quakeml'];
-		eventParameters = quakeml.eventParameters;
-		ev = eventParameters[eventElement];
-		if (typeof ev === 'undefined') {
-			throw new Error('Event element ' + eventElement + ' not found');
-		}
+  /**
+   * Initialize the quakeml object.
+   */
+  _initialize = function () {
+    var eventElement = options.eventElement || 'event',
+        json,
+        quakeml,
+        eventParameters,
+        ev;
 
-		this._quakeml = quakeml;
-		this._updated = eventParameters.creationInfo.creationTime;
-		this._event = new QuakemlEvent((Array.isArray(ev) ? ev[0] : ev));
-	};
+    json = XmlUtil.xmlToJson(options.xml);
+    quakeml = json['q:quakeml'];
+    eventParameters = quakeml.eventParameters;
+    ev = eventParameters[eventElement];
+    if (typeof ev === 'undefined') {
+      throw new Error('Event element ' + eventElement + ' not found');
+    }
 
-
-	/**
-	 * @return {String} iso8601 timestamp when quakeml message was updated.
-	 */
-	Quakeml.prototype.getUpdated = function () {
-		return this._updated;
-	};
-
-	/**
-	 * @return {Element} event element from quakeml message.
-	 */
-	Quakeml.prototype.getEvent = function () {
-		return this._event;
-	};
-
-	/**
-	 * @return {Array<Object>} origins parsed from event element.
-	 */
-	Quakeml.prototype.getOrigins = function () {
-		return this._event.getOrigins();
-	};
-
-	/**
-	 * @return {Array<Object>} magnitudes parsed from event element.
-	 */
-	Quakeml.prototype.getMagnitudes = function () {
-		return this._event.getMagnitudes();
-	};
+    _quakeml = quakeml;
+    _updated = eventParameters.creationInfo.creationTime;
+    _event = QuakemlEvent((Array.isArray(ev) ? ev[0] : ev));
+  };
 
 
-	return Quakeml;
-});
+  /**
+   * @return {String} iso8601 timestamp when quakeml message was updated.
+   */
+  _this.getUpdated = function () {
+    return _updated;
+  };
+
+  /**
+   * @return {Element} event element from quakeml message.
+   */
+  _this.getQuakemlEvent = function () {
+    return _event.getEvent();
+  };
+
+  /**
+   * @return {Array<Object>} origins parsed from event element.
+   */
+  _this.getOrigins = function () {
+    return _event.getOrigins();
+  };
+
+  /**
+   * @return {Array<Object>} magnitudes parsed from event element.
+   */
+  _this.getMagnitudes = function () {
+    return _event.getMagnitudes();
+  };
+
+  _initialize();
+  return _this;
+
+};
+
+
+module.exports = Quakeml;
