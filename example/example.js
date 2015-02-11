@@ -2,11 +2,9 @@
 
 var Quakeml = require('quakeml/Quakeml');
 
-var url = 'data/usc000p11f_phase-data.xml',
+var url = 'data/ci15481673_phase-data.xml',
     xhr,
     el;
-
-url = 'data/ci15481673_phase-data.xml';
 
 /**
  * Output object properties.
