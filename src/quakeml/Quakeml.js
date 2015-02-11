@@ -52,17 +52,10 @@ var Quakeml = function (options) {
 
 
   /**
-   * @return {String} iso8601 timestamp when quakeml message was updated.
+   * @return {Array<Object>} magnitudes parsed from event element.
    */
-  _this.getUpdated = function () {
-    return _updated;
-  };
-
-  /**
-   * @return {Element} event element from quakeml message.
-   */
-  _this.getQuakemlEvent = function () {
-    return _event.getEvent();
+  _this.getMagnitudes = function () {
+    return _event.getMagnitudes();
   };
 
   /**
@@ -73,10 +66,17 @@ var Quakeml = function (options) {
   };
 
   /**
-   * @return {Array<Object>} magnitudes parsed from event element.
+   * @return {Element} event element from quakeml message.
    */
-  _this.getMagnitudes = function () {
-    return _event.getMagnitudes();
+  _this.getQuakemlEvent = function () {
+    return _event.getEvent();
+  };
+
+    /**
+   * @return {String} iso8601 timestamp when quakeml message was updated.
+   */
+  _this.getUpdated = function () {
+    return _updated;
   };
 
   _initialize(options);
