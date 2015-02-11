@@ -11,7 +11,7 @@ var connect = {
       base: [
         config.build + '/' + config.src,
         config.example,
-        'resources'
+        'etc'
       ],
       livereload: true,
       open: 'http://localhost:8000/example.html',
@@ -23,7 +23,7 @@ var connect = {
       base: [
         config.build + '/' + config.src,
         config.build + '/' + config.test,
-        'resources',
+        'etc',
         'node_modules'
       ],
       open: 'http://localhost:8001/test.html',
@@ -35,8 +35,7 @@ var connect = {
       base: [
         config.dist,
         config.example,
-        'resources',
-        'node_modules'
+        'etc'
       ],
       keepalive: true,
       open: 'http://localhost:8002/example.html',
