@@ -1,6 +1,26 @@
 'use strict';
 
 /**
+ * Convert an object to an array if needed.
+ *
+ * @param obj {Any}
+ * @return {Array}
+ *         if obj is an Object, either
+ *           obj, if obj is already an array,
+ *           otherwise, [obj]
+ *         otherwise, [].
+ */
+var _array = function (obj) {
+  if (Array.isArray(obj)) {
+    return obj;
+  } else if (typeof obj === 'object' && obj !== null) {
+    return [obj];
+  } else {
+    return [];
+  }
+};
+
+/**
  * Copy properties from source objects onto dest.
  *
  * @param dest {Object}
@@ -26,26 +46,6 @@ var _extend = function (dest /*, varargs */) {
 };
 
 /**
- * Convert an object to an array if needed.
- *
- * @param obj {Any}
- * @return {Array}
- *         if obj is an Object, either
- *           obj, if obj is already an array,
- *           otherwise, [obj]
- *         otherwise, [].
- */
-var _array = function (obj) {
-  if (Array.isArray(obj)) {
-    return obj;
-  } else if (typeof obj === 'object' && obj !== null) {
-    return [obj];
-  } else {
-    return [];
-  }
-};
-
-/**
  * Build a lookup index for objects, based on (unique) property value.
  *
  * For Example:
@@ -65,9 +65,9 @@ var _array = function (obj) {
  * @return {Object} indexed data.
  */
 var _index = function (objs, key, index) {
-  var obj,
-      i,
-      len;
+  var i,
+      len,
+      obj;
   index = index || {};
   if (objs) {
     if (!Array.isArray(objs)) {
@@ -97,15 +97,15 @@ var QuakemlEvent = function (ev) {
       _ev,
       _magnitudes,
       _origins,
-      _preferredOriginID,
-      _preferredMagnitudeID,
       _pickIndex,
+      _preferredMagnitudeID,
+      _preferredOriginID,
       _stationMagnitudeIndex,
 
-      _parseOrigins,
       _parseArrivals,
-      _parseMagnitudes,
-      _parseMagnitudeContributions;
+      _parseOrigins,
+      _parseMagnitudeContributions,
+      _parseMagnitudes;
 
 
   _this = Object.create({});
@@ -113,7 +113,7 @@ var QuakemlEvent = function (ev) {
   /**
    * Initialize this event, by parsing origins and magnitudes.
    */
-  _initialize = function () {
+  _initialize = function (ev) {
     _ev = ev;
     _catalog = _ev['catalog:eventSource'];
     _preferredOriginID = _ev.preferredOriginID || null;
@@ -129,32 +129,6 @@ var QuakemlEvent = function (ev) {
   };
 
   /**
-   * Parse an array of origin elements.
-   *
-   * @param origins {Array<Element>}
-   *        array of quakeml origin elements.
-   * @return {Array<Object>} parsed origin objects.
-   */
-  _parseOrigins = function (origins) {
-    var parsed = [],
-        preferredOriginID = _preferredOriginID,
-        origin,
-        o;
-    for (o = 0; o < origins.length; o++) {
-      origin = _extend({}, origins[o]);
-      origin.isPreferred = (preferredOriginID === origin.publicID);
-      origin.arrivals = _parseArrivals(_array(origin.arrival));
-      delete origin.arrival;
-      if (origin.isPreferred) {
-        parsed.unshift(origin);
-      } else {
-        parsed.push(origin);
-      }
-    }
-    return parsed;
-  };
-
-  /**
    * Parse an array of arrival elements.
    *
    * @param arrivals {Array<Element>}
@@ -162,10 +136,11 @@ var QuakemlEvent = function (ev) {
    * @return {Array<Object>} parsed arrival objects.
    */
   _parseArrivals = function (arrivals) {
-    var parsed = [],
-        pickIndex = _pickIndex,
+    var a,
         arrival,
-        a;
+        parsed = [],
+        pickIndex = _pickIndex;
+
     for (a = 0; a < arrivals.length; a++) {
       arrival = _extend({}, arrivals[a]);
       if (typeof arrival.pickID === 'string') {
@@ -179,6 +154,35 @@ var QuakemlEvent = function (ev) {
   };
 
   /**
+   * Parse an array of stationMagnitudeContribution elements.
+   *
+   * @param contributions {Array<Element>}
+   *        array of quakeml stationMagnitudeContribution elements.
+   * @return {Array<Object>} parsed stationMagnitudeContribution objects.
+   */
+  _parseMagnitudeContributions = function (contributions) {
+    var amplitudeIndex = _amplitudeIndex,
+        c,
+        contribution,
+        parsed = [],
+        stationMagnitude,
+        stationMagnitudeIndex = _stationMagnitudeIndex;
+
+    for (c = 0; c < contributions.length; c++) {
+      contribution = _extend({}, contributions[c]);
+      stationMagnitude = _extend({},
+          stationMagnitudeIndex[contribution.stationMagnitudeID]);
+      contribution.stationMagnitude = stationMagnitude;
+      if (typeof stationMagnitude.amplitudeID === 'string') {
+        stationMagnitude.amplitude = _extend({},
+            amplitudeIndex[stationMagnitude.amplitudeID]);
+      }
+      parsed.push(contribution);
+    }
+    return parsed;
+  };
+
+  /**
    * Parse and array of magnitude elements.
    *
    * @param magnitudes {Array<Element>}
@@ -186,10 +190,11 @@ var QuakemlEvent = function (ev) {
    * @return {Array<Object>} parsed magnitude objects.
    */
   _parseMagnitudes = function (magnitudes) {
-    var parsed = [],
-        preferredMagnitudeID = _preferredMagnitudeID,
+    var m,
         magnitude,
-        m;
+        parsed = [],
+        preferredMagnitudeID = _preferredMagnitudeID;
+
     for (m = 0; m < magnitudes.length; m++) {
       magnitude = _extend({}, magnitudes[m]);
       magnitude.isPreferred = (preferredMagnitudeID === magnitude.publicID);
@@ -206,29 +211,28 @@ var QuakemlEvent = function (ev) {
   };
 
   /**
-   * Parse an array of stationMagnitudeContribution elements.
+   * Parse an array of origin elements.
    *
-   * @param contributions {Array<Element>}
-   *        array of quakeml stationMagnitudeContribution elements.
-   * @return {Array<Object>} parsed stationMagnitudeContribution objects.
+   * @param origins {Array<Element>}
+   *        array of quakeml origin elements.
+   * @return {Array<Object>} parsed origin objects.
    */
-  _parseMagnitudeContributions = function (contributions) {
-    var parsed = [],
-        stationMagnitudeIndex = _stationMagnitudeIndex,
-        amplitudeIndex = _amplitudeIndex,
-        contribution,
-        stationMagnitude,
-        c;
-    for (c = 0; c < contributions.length; c++) {
-      contribution = _extend({}, contributions[c]);
-      stationMagnitude = _extend({},
-          stationMagnitudeIndex[contribution.stationMagnitudeID]);
-      contribution.stationMagnitude = stationMagnitude;
-      if (typeof stationMagnitude.amplitudeID === 'string') {
-        stationMagnitude.amplitude = _extend({},
-            amplitudeIndex[stationMagnitude.amplitudeID]);
+  _parseOrigins = function (origins) {
+    var o,
+        origin,
+        parsed = [],
+        preferredOriginID = _preferredOriginID;
+
+    for (o = 0; o < origins.length; o++) {
+      origin = _extend({}, origins[o]);
+      origin.isPreferred = (preferredOriginID === origin.publicID);
+      origin.arrivals = _parseArrivals(_array(origin.arrival));
+      delete origin.arrival;
+      if (origin.isPreferred) {
+        parsed.unshift(origin);
+      } else {
+        parsed.push(origin);
       }
-      parsed.push(contribution);
     }
     return parsed;
   };
@@ -241,20 +245,21 @@ var QuakemlEvent = function (ev) {
   };
 
   /**
-   * @return {Array<Object>} origins parsed from event.
-   */
-  _this.getOrigins = function () {
-    return _origins;
-  };
-
-  /**
    * @return {Array<Object>} magnitudes parsed from event.
    */
   _this.getMagnitudes = function () {
     return _magnitudes;
   };
 
-  _initialize();
+  /**
+   * @return {Array<Object>} origins parsed from event.
+   */
+  _this.getOrigins = function () {
+    return _origins;
+  };
+
+  _initialize(ev);
+  ev = null;
   return _this;
 
 };
