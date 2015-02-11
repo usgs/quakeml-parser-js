@@ -17,11 +17,12 @@ var watch = {
       config.example + '/**/*.html',
       config.test + '/**/*.html'
     ],
-    tasks: [ 'copy:example', 'copy:test']
+    tasks: ['copy:test']
   },
   reload: {
     files: [
-      config.build + '/**/*'
+      config.build + '/**/*',
+      config.example + '**/*'
     ],
     options: {
       livereload: true
