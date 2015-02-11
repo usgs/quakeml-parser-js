@@ -1,7 +1,7 @@
 'use strict';
 
-var XmlUtil = require('./XmlUtil'),
-    QuakemlEvent = require('./QuakemlEvent');
+var XmlUtil = require('quakeml/XmlUtil'),
+    QuakemlEvent = require('quakeml/QuakemlEvent');
 
 
 /**
@@ -30,12 +30,12 @@ var Quakeml = function (options) {
   /**
    * Initialize the quakeml object.
    */
-  _initialize = function () {
-    var eventElement = options.eventElement || 'event',
-        json,
-        quakeml,
+  _initialize = function (options) {
+    var ev,
+        eventElement = options.eventElement || 'event',
         eventParameters,
-        ev;
+        json,
+        quakeml;
 
     json = XmlUtil.xmlToJson(options.xml);
     quakeml = json['q:quakeml'];
@@ -79,7 +79,8 @@ var Quakeml = function (options) {
     return _event.getMagnitudes();
   };
 
-  _initialize();
+  _initialize(options);
+  options=null;
   return _this;
 
 };
