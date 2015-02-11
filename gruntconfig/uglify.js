@@ -4,12 +4,13 @@ var config = require('./config');
 
 var uglify = {
   dist: {
-    files: {}
+    src:config.dist + '/quakeml-parser.js',
+    dest:config.build + '/' + config.src + '/quakeml-parser.js'
   }
 };
 
-uglify.dist.files[config.dist + '/quakeml-parser.js'] = [
-  config.build + '/' + config.src + '/quakeml-parser.js'
-];
+// uglify.dist.files[config.dist + '/quakeml-parser.js'] = [
+//   config.build + '/' + config.src + '/quakeml-parser.js'
+// ];
 
 module.exports = uglify;
