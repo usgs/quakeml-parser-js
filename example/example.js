@@ -198,9 +198,9 @@ xhr.onload = function () {
   buf.push('</div>');
   // list magnitudes
   buf.push('<div class="magnitudes">');
-  magnitudes = quakeml.getMagnitudes;
+  magnitudes = quakeml.getMagnitudes();
   for (m = 0; m < magnitudes.length; m++) {
-    buf.push(showMagnitude(m));
+    buf.push(showMagnitude(magnitudes[m]));
   }
   buf.push('</div>');
   // insert into page
