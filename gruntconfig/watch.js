@@ -14,7 +14,6 @@ var watch = {
   },
   html: {
     files: [
-      config.example + '/**/*.html',
       config.test + '/**/*.html'
     ],
     tasks: ['copy:test']
