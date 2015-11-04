@@ -17,7 +17,9 @@ var browserify = {
     src: [],
     dest: config.build + '/' + config.src + '/quakeml-parser.js',
     options: {
-      alias: './src/quakeml/Quakeml.js:quakeml/Quakeml'
+      alias: [
+        './src/quakeml/Quakeml.js:quakeml/Quakeml'
+      ]
     }
   },
 
@@ -25,7 +27,9 @@ var browserify = {
     src: config.test + '/test.js',
     dest: config.build + '/' + config.test + '/test.js',
     options: {
-      external: 'quakeml/Quakeml'
+      external: [
+        'quakeml/Quakeml'
+      ]
     }
   }
 };
