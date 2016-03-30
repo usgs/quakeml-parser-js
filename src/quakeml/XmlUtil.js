@@ -55,10 +55,10 @@ var XmlUtil = {
     }
 
     // clean up '#text' nodes
-    if (children.length === 1 && obj['#text']) {
+    if (children.length === 1 &&
+        obj['#text'] &&
+        Object.keys(obj).length === 1) {
       return obj['#text'];
-    } else if (obj['#text']) {
-      delete obj['#text'];
     }
 
     return obj;
