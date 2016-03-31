@@ -28,6 +28,17 @@ describe('XmlUtil unit tests', function () {
       expect(json.el.child1[1]).to.equal('value2');
     });
 
+    it('handles elements with attributes _and_ content', function () {
+      var xmlString,
+          json;
+
+      xmlString = '<el>' +
+          '<child1 attr1="value1">content</child1>' +
+          '</el>';
+      json = XmlUtil.xmlToJson(xmlString);
+      expect(json.el.child1.attr1).to.equal('value1');
+      expect(json.el.child1['#text']).to.equal('content');
+    });
   });
 
 });
