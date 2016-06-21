@@ -39,6 +39,7 @@ describe('Unit tests for the "Quakeml" class', function () {
     it('parses origins', function () {
       var origins = quakeml.getOrigins(),
           origin;
+
       expect(origins).to.not.equal(null);
       expect(origins.length).to.equal(1);
       origin = origins[0];
@@ -52,6 +53,11 @@ describe('Unit tests for the "Quakeml" class', function () {
       var magnitude = quakeml.getMagnitudes()[0];
       expect(magnitude.mag.value).to.equal('4.8');
       expect(magnitude.type).to.equal('mb');
+    });
+
+    it('inherits event creationInfo', function () {
+      var magnitude = quakeml.getMagnitudes()[0];
+      expect(magnitude.creationInfo.agencyID).to.equal('us');
     });
   });
 
