@@ -47,7 +47,7 @@ var Quakeml = function (options) {
 
     _quakeml = quakeml;
     _updated = eventParameters.creationInfo.creationTime;
-    _event = QuakemlEvent((Array.isArray(ev) ? ev[0] : ev));
+    _event = QuakemlEvent((Array.isArray(ev) ? ev[0] : ev), eventParameters);
   };
 
 
