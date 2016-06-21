@@ -88,13 +88,14 @@ var _index = function (objs, key, index) {
  * @param ev {Element}
  *        Quakeml event(like) element
  */
-var QuakemlEvent = function (ev) {
+var QuakemlEvent = function (ev, eventParameters) {
   var _this,
       _initialize,
 
       _amplitudeIndex,
       _catalog,
       _ev,
+      _eventParameters,
       _magnitudes,
       _origins,
       _pickIndex,
@@ -113,8 +114,9 @@ var QuakemlEvent = function (ev) {
   /**
    * Initialize this event, by parsing origins and magnitudes.
    */
-  _initialize = function (ev) {
+  _initialize = function (ev, eventParameters) {
     _ev = ev;
+    _eventParameters = eventParameters;
     _catalog = _ev['catalog:eventSource'];
     _preferredOriginID = _ev.preferredOriginID || null;
     _preferredMagnitudeID = _ev.preferredMagnitudeID || null;
@@ -197,6 +199,8 @@ var QuakemlEvent = function (ev) {
 
     for (m = 0; m < magnitudes.length; m++) {
       magnitude = _extend({}, magnitudes[m]);
+      magnitude.creationInfo = _extend({},
+          eventParameters.creationInfo, _ev.creationInfo, magnitude.creationInfo);
       magnitude.isPreferred = (preferredMagnitudeID === magnitude.publicID);
       magnitude.contributions = _parseMagnitudeContributions(
           _array(magnitude.stationMagnitudeContribution));
@@ -225,6 +229,8 @@ var QuakemlEvent = function (ev) {
 
     for (o = 0; o < origins.length; o++) {
       origin = _extend({}, origins[o]);
+      origin.creationInfo = _extend({},
+          eventParameters.creationInfo, _ev.creationInfo, origin.creationInfo);
       origin.isPreferred = (preferredOriginID === origin.publicID);
       origin.arrivals = _parseArrivals(_array(origin.arrival));
       delete origin.arrival;
@@ -258,8 +264,9 @@ var QuakemlEvent = function (ev) {
     return _origins;
   };
 
-  _initialize(ev);
+  _initialize(ev, eventParameters);
   ev = null;
+  eventParameters = null;
   return _this;
 
 };
