@@ -18,7 +18,6 @@
         <evaluationMode>manual</evaluationMode>
         <evaluationStatus>preliminary</evaluationStatus>
         <creationInfo>
-          <agencyID>us</agencyID>
           <agencyURI>smi:anss.org/metadata/agencyid/us</agencyURI>
           <creationTime>2014-03-30T12:51:31.000Z</creationTime>
         </creationInfo>
